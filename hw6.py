@@ -132,11 +132,11 @@ def solve_mdp():
 
             # look ahead at the best possible future action
             maxNextQ = np.max(q_values[store[nexts]])
-            q_goal=0.0+gamma*maxNextQ
+            qGoal=0.0+gamma*maxNextQ
 
             currColumn = actions.index(action)
-            q_error = q_goal - q_values[store[curr], currColumn]
-            q_values[store[curr], currColumn] += alpha * q_error
+            qError = qGoal - q_values[store[curr], currColumn]
+            q_values[store[curr], currColumn] += alpha * qError
 
             curr = nexts
 
