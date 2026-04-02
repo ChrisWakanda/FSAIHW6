@@ -51,7 +51,7 @@ def solve_mdp():
 
     # PART A - Value Iteration
 
-    policy=np.full(len(states), dtype=int)
+    policy=np.zeros(len(states), dtype=int)
 
     for _ in range(100):
         # Must update based on the previous iteration's board state
@@ -91,7 +91,7 @@ def solve_mdp():
         curr = states[np.random.choice(len(states))]
 
         while curr not in terminal_states:
-            nextAction=policy[store[curr]]
+            nextAction=actions[policy[store[curr]]]
             possibleDirections=[]
             probabs=[]
             for d, prob in incline[nextAction]:
