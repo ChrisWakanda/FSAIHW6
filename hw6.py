@@ -51,7 +51,7 @@ def solve_mdp():
 
     # PART A - Value Iteration
 
-    policy=np.full(len(states), "", dtype=object)
+    policy=np.full(len(states), dtype=int)
 
     for _ in range(100):
         # Must update based on the previous iteration's board state
@@ -74,7 +74,7 @@ def solve_mdp():
                     bval=possibleVal
                     baction=action
             clonedUtils[store[state]]=bval
-            policy[store[state]]=baction
+            policy[store[state]]=actions.index(baction)
         utilities_vi=clonedUtils
 
     # PART B - TD Learning
