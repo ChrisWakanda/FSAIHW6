@@ -79,13 +79,10 @@ def solve_mdp():
 
     # PART B - TD Learning
 
-    alpha = 0.02
+    learningRate = 0.02
     gamma = 0.9
     utilities_td=np.zeros(len(states))
     
-    for t_state in terminal_states:
-        utilities_td[store[t_state]] = terminal_states[t_state]
-
     for _ in range(5000):
         # dropping the agent anywhere for maximium exploration
         curr = states[np.random.choice(len(states))]
@@ -103,19 +100,26 @@ def solve_mdp():
             nexts=nextState(curr, realDirection)
 
             # TD update rule
-            td_goal=0.0+gamma*utilities_td[store[nexts]]
-            td_error=td_goal - utilities_td[store[curr]]
-            utilities_td[store[curr]]+=alpha*td_error
+            previousUtility = utilities_td[store[curr]]
+            nextUtility = utilities_td[store[nexts]]
+
+            if nexts in terminal_states:
+                reward = terminal_states[nexts]
+            else:
+                reward = 0.0
+
+            td_error=(reward + (gamma * nextUtility)) - previousUtility
+            utilities_td[store[curr]]=previousUtility + (learningRate * td_error)
 
             curr=nexts
+
+    # Hardcoded the terminal states in the finl array so it prints correctly
+    for t_state in terminal_states:
+        utilities_td[store[t_state]] = terminal_states[t_state]
 
     # PART C - Q Learning
 
     q_values = np.zeros((len(states), 4))
-
-    for t_state in terminal_states:
-        for a in actions:
-            q_values[store[t_state], actions.index(a)] = terminal_states[t_state]
 
     for _ in range(5000):
         curr = states[np.random.choice(len(states))]
@@ -130,15 +134,25 @@ def solve_mdp():
             realDirection = np.random.choice(possibleDirections, p=probabs)
             nexts = nextState(curr, realDirection)
 
+            currColumn = actions.index(action)
+            priorQVal = q_values[store[curr], currColumn]
+
             # look ahead at the best possible future action
             maxNextQ = np.max(q_values[store[nexts]])
-            qGoal=0.0+gamma*maxNextQ
+            
+            if nexts in terminal_states:
+                reward = terminal_states[nexts]
+            else:
+                reward = 0.0
 
-            currColumn = actions.index(action)
-            qError = qGoal - q_values[store[curr], currColumn]
-            q_values[store[curr], currColumn] += alpha * qError
+            tdError = (reward + (gamma * maxNextQ)) - priorQVal
+            q_values[store[curr], currColumn] = priorQVal + (learningRate * tdError)
 
             curr = nexts
+
+    for t_state in terminal_states:
+        for a in actions:
+            q_values[store[t_state], actions.index(a)] = terminal_states[t_state]
 
     # rounding
     utilities_vi=np.round(utilities_vi, 3)
